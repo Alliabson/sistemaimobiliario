@@ -702,12 +702,11 @@ def gerar_excel(cronograma, dados):
         st.error(f"Erro ao gerar Excel: {str(e)}")
         return BytesIO()
 
-def main():
+def main(logo=None):
     set_theme()
     
     st.write("\n")
     
-    logo = load_logo()
     if logo:
         col1, col2 = st.columns([1, 4])
         with col1:
@@ -715,7 +714,7 @@ def main():
         with col2:
             st.title("**Seja bem vindo ao Simulador da JMD URBANISMO**")
     else:
-        st.title("Simulador Imobiliária Celeste")
+        st.title("Simulador Financeiro")
    
     # Inicialização das variáveis de sessão - TODAS ZERADAS/VAZIAS, exceto taxa_mensal
     if 'valor_total' not in st.session_state:
