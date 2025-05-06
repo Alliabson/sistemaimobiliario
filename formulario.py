@@ -1187,7 +1187,7 @@ else:
         st.rerun()
 
     # Abas principais
-    tab1, tab2, tab3 = st.tabs([
+    tab1, tab2, tab3, tab4 = st.tabs([
         "Ficha Cadastral PF", 
         "Ficha Cadastral PJ", 
         "Consulta de Registros"
@@ -2197,7 +2197,10 @@ else:
                         else:
                             excluir_cliente_pj(registro_id)
                             st.session_state.clientes_pj = carregar_clientes_pj(st.session_state['usuario']['id'] if not st.session_state['usuario']['is_admin'] else None)
-                        
+with tab4:
+    # Importar e executar o simulador
+    from simulador import main as simulador_main
+    simulador_main()                        
                         st.success("Registro excluído com sucesso!")
                         time.sleep(1)
                         st.rerun()
