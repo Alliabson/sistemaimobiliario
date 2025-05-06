@@ -2197,13 +2197,14 @@ else:
                         else:
                             excluir_cliente_pj(registro_id)
                             st.session_state.clientes_pj = carregar_clientes_pj(st.session_state['usuario']['id'] if not st.session_state['usuario']['is_admin'] else None)
-with tab4:
-    # Importar e executar o simulador
-    from simulador import main as simulador_main
-    simulador_main()
-with tab4:
-    from simulador import main as simulador_main
-    simulador_main(logo=LOGO_CACHE)  # Passe a logo que já foi carregada
+    with tab4:
+        st.header("Simulador Financeiro")
+        try:
+            from simulador import main as simulador_main
+            simulador_main(logo=LOGO_CACHE)
+        except Exception as e:
+            st.error(f"Erro ao carregar o simulador: {e}")
+            st.error("Por favor, verifique se o arquivo simulador.py está no diretório correto")
                         st.success("Registro excluído com sucesso!")
                         time.sleep(1)
                         st.rerun()
