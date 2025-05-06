@@ -2200,7 +2200,10 @@ else:
 with tab4:
     # Importar e executar o simulador
     from simulador import main as simulador_main
-    simulador_main()                        
+    simulador_main()
+with tab4:
+    from simulador import main as simulador_main
+    simulador_main(logo=LOGO_CACHE)  # Passe a logo que já foi carregada
                         st.success("Registro excluído com sucesso!")
                         time.sleep(1)
                         st.rerun()
