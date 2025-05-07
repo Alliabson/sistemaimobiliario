@@ -55,6 +55,14 @@ def load_logo():
 def set_theme():
     st.markdown("""
     <style>
+            /* Botões */
+        .stButton button {
+            background-color: #0056b3;
+            color: white;
+            border: none;
+            border-radius: 4px;
+        }
+        
             /* EFEITO HOVER - VERMELHO INTENSO */
         div[data-testid="stForm"] button[kind="secondaryFormSubmit"]:hover,
         div[data-testid="stForm"] button[kind="secondary"]:hover,
