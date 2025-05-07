@@ -4,3 +4,4 @@ streamlit
  fpdf2
  openpyxl
  XlsxWriter
+numpy-financial
