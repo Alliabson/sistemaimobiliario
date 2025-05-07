@@ -1190,9 +1190,9 @@ else:
     tab1, tab2, tab3, tab4 = st.tabs([
         "Ficha Cadastral PF", 
         "Ficha Cadastral PJ", 
-        "Consulta de Registros"
+        "Consulta de Registros",
+        "Simulador Financeiro"  # Adicionei o quarto item
     ])
-
     # Variáveis para controle dos downloads
     pdf_path_pf = None
     pdf_path_pj = None
@@ -2187,24 +2187,31 @@ else:
                             st.session_state['editar_pf_id'] = registro_id
                         else:
                             st.session_state['editar_pj_id'] = registro_id
-                        st.rerun()
-                
+                        st.rerun()               
+
+
                 with col3:
                     if st.button("Excluir Registro", disabled=bloqueio):
                         if tipo_consulta == "Pessoa Física":
                             excluir_cliente_pf(registro_id)
-                            st.session_state.clientes_pf = carregar_clientes_pf(st.session_state['usuario']['id'] if not st.session_state['usuario']['is_admin'] else None)
+                            st.session_state.clientes_pf = carregar_clientes_pf(
+                                st.session_state['usuario']['id'] if not st.session_state['usuario']['is_admin'] else None
+                            )
                         else:
                             excluir_cliente_pj(registro_id)
-                            st.session_state.clientes_pj = carregar_clientes_pj(st.session_state['usuario']['id'] if not st.session_state['usuario']['is_admin'] else None)
-    with tab4:
-        st.header("Simulador Financeiro")
-        try:
-            from simulador import main as simulador_main
-            simulador_main(logo=LOGO_CACHE)
-        except Exception as e:
-            st.error(f"Erro ao carregar o simulador: {e}")
-            st.error("Por favor, verifique se o arquivo simulador.py está no diretório correto")
+                            st.session_state.clientes_pj = carregar_clientes_pj(
+                                st.session_state['usuario']['id'] if not st.session_state['usuario']['is_admin'] else None
+                            )
+                        
                         st.success("Registro excluído com sucesso!")
                         time.sleep(1)
                         st.rerun()
+        with tab4:
+            st.header("Simulador Financeiro")
+            try:
+                from simulador import main as simulador_main
+                simulador_main()
+            except Exception as e:
+                st.error(f"Erro ao carregar o simulador: {e}")
+                time.sleep(1)
+                st.rerun()
