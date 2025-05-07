@@ -2215,7 +2215,3 @@ else:
                 st.error(f"Erro ao carregar o simulador: {e}")
                 time.sleep(1)
                 st.rerun()
-
-# Rodapé
-st.markdown("---")
-st.markdown("App desenvolvido com Python Alliabson @2025")
