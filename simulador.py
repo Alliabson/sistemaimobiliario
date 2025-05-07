@@ -62,6 +62,9 @@ def set_theme():
             border: none;
             border-radius: 4px;
         }
+        .stButton button:hover {
+            background-color: #003d82;
+        }
         
             /* EFEITO HOVER - VERMELHO INTENSO */
         div[data-testid="stForm"] button[kind="secondaryFormSubmit"]:hover,
