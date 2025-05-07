@@ -52,9 +52,36 @@ def load_logo():
         st.warning(f"Não foi possível carregar a logo: {str(e)}")
         return None
 
+def set_theme():
+    st.markdown("""
+    <style>
+            /* EFEITO HOVER - VERMELHO INTENSO */
+        div[data-testid="stForm"] button[kind="secondaryFormSubmit"]:hover,
+        div[data-testid="stForm"] button[kind="secondary"]:hover,
+        .stDownloadButton button:hover {
+            background-color: #FF4D4D !important;  /* Vermelho vibrante */
+            transform: translateY(-2px) !important;
+            box-shadow: 0 4px 8px rgba(255, 77, 77, 0.2) !important;
+        }
 
-
-
+        /* EFEITO CLIQUE */
+        div[data-testid="stForm"] button[kind="secondaryFormSubmit"]:active,
+        div[data-testid="stForm"] button[kind="secondary"]:active,
+        .stDownloadButton button:active {
+            transform: translateY(0) !important;
+            background-color: #E04444 !important;  /* Vermelho mais escuro */
+        }
+        /* TEXTO DOS BOTÕES */
+        div[data-testid="stForm"] button > div > p,
+        .stDownloadButton button > div > p {
+            color: white !important;
+            font-size: 14px !important;
+            margin: 0 !important;
+        }
+    </style>
+    """, unsafe_allow_html=True)
+    
+    
 
 # Função de formatação de moeda robusta
 def formatar_moeda(valor, simbolo=True):
@@ -492,7 +519,7 @@ def gerar_excel(cronograma, dados):
         return BytesIO()
 
 def main():
-
+    set_theme()
     
     st.write("\n")
     
@@ -502,7 +529,7 @@ def main():
         with col1:
             st.image(logo, width=200, use_container_width=False)
         with col2:
-            st.title("**Seja bem vindo ao Simulador da JMD HAMOA**")
+            st.title("**Seja bem vindo ao Simulador da JMD URBANISMO**")
     else:
         st.title("Simulador Imobiliária Celeste")
    
