@@ -1,4 +1,3 @@
-
 import streamlit as st
 from datetime import datetime, timedelta
 from PIL import Image
@@ -53,7 +52,6 @@ def load_logo():
         st.warning(f"Não foi possível carregar a logo: {str(e)}")
         return None
 
-st.set_page_config(layout="wide")
 
 def set_theme():
     st.markdown("""
@@ -702,11 +700,12 @@ def gerar_excel(cronograma, dados):
         st.error(f"Erro ao gerar Excel: {str(e)}")
         return BytesIO()
 
-def main(logo=None):
+def main():
     set_theme()
     
     st.write("\n")
     
+    logo = load_logo()
     if logo:
         col1, col2 = st.columns([1, 4])
         with col1:
@@ -714,7 +713,7 @@ def main(logo=None):
         with col2:
             st.title("**Seja bem vindo ao Simulador da JMD URBANISMO**")
     else:
-        st.title("Simulador Financeiro")
+        st.title("Simulador Imobiliária Celeste")
    
     # Inicialização das variáveis de sessão - TODAS ZERADAS/VAZIAS, exceto taxa_mensal
     if 'valor_total' not in st.session_state:
