@@ -1,7 +1,3 @@
-# Banco de dados
-*.db
-*.sqlite
-
 # Backups
 backups/
 
