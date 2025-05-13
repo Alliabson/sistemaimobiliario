@@ -16,6 +16,7 @@ import random
 import ssl
 from email.message import EmailMessage
 import json
+import os
 
 # Configuração inicial
 st.set_page_config(layout="wide")
@@ -29,7 +30,7 @@ except Exception as e:
     st.warning(f"Não foi possível carregar a logo: {e}")
 
 # Configuração do banco de dados
-DB_NAME = "celeste.db"
+DB_NAME = os.path.join(os.path.dirname(__file__), "celeste.db")
 
 # Configurações de e-mail
 EMAIL_REMETENTE = "alli@imobiliariaceleste.com.br"
@@ -66,25 +67,30 @@ def enviar_email(destinatario, codigo):
 
 # Função para criar tabelas do banco de dados
 def criar_tabelas():
+    # Verificar se o arquivo do banco já existe
+    db_existe = os.path.exists(DB_NAME)
+    
     conn = sqlite3.connect(DB_NAME)
     cursor = conn.cursor()
     
-    cursor.execute('''
-    CREATE TABLE IF NOT EXISTS usuarios (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        username TEXT NOT NULL UNIQUE,
-        senha_hash TEXT NOT NULL,
-        nome_completo TEXT NOT NULL,
-        cpf TEXT,
-        email TEXT,
-        telefone TEXT,
-        imobiliaria TEXT,
-        is_admin INTEGER DEFAULT 0,
-        data_criacao TEXT,
-        token_recuperacao TEXT,
-        token_validade TEXT
-    )
-    ''')
+    # Só criar tabelas se o banco não existia antes
+    if not db_existe:
+        cursor.execute('''
+        CREATE TABLE IF NOT EXISTS usuarios (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            username TEXT NOT NULL UNIQUE,
+            senha_hash TEXT NOT NULL,
+            nome_completo TEXT NOT NULL,
+            cpf TEXT,
+            email TEXT,
+            telefone TEXT,
+            imobiliaria TEXT,
+            is_admin INTEGER DEFAULT 0,
+            data_criacao TEXT,
+            token_recuperacao TEXT,
+            token_validade TEXT
+        )
+        ''')
     
     cursor.execute('''
     CREATE TABLE IF NOT EXISTS clientes_pf (
