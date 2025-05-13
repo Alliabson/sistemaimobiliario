@@ -1,3 +1,10 @@
+# Banco de dados
+*.db
+*.sqlite
+
+# Backups
+backups/
+
 # Ambiente virtual
 venv/
 .env
