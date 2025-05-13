@@ -40,6 +40,26 @@ SENHA_APP = "jzix jalk dnkx wreq"
 def criar_hash(senha):
     return hashlib.sha256(senha.encode()).hexdigest()
 
+def fazer_backup():
+    try:
+        # Criar pasta de backups se não existir
+        os.makedirs("backups", exist_ok=True)
+        
+        # Nome do arquivo de backup com timestamp
+        backup_name = f"backups/celeste_backup_{datetime.now().strftime('%Y%m%d_%H%M%S')}.db"
+        
+        # Copiar o banco atual para o backup
+        import shutil
+        shutil.copyfile(DB_NAME, backup_name)
+        
+        # Manter também uma cópia como "latest.db"
+        shutil.copyfile(DB_NAME, "backups/latest.db")
+        
+    except Exception as e:
+        st.error(f"Erro ao fazer backup: {e}")
+
+# Chamar a função após operações importantes
+fazer_backup()
 # Funções de e-mail
 def gerar_codigo_autenticacao():
     return str(random.randint(100000, 999999))
