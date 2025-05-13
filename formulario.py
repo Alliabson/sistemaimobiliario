@@ -18,12 +18,17 @@ import ssl
 from email.message import EmailMessage
 import json
 import shutil
+import subprocess
+
+if submitted_pf:
+    salvar_cliente_pf(...)
+    backup_to_github()
 
 # Configuração inicial
 st.set_page_config(layout="wide")
 
 # Configuração de diretório persistente
-DATA_DIR = Path(__file__).parent / "persistent_data"
+DATA_DIR = Path(".") / "persistent_data"
 DATA_DIR.mkdir(exist_ok=True)
 DB_NAME = str(DATA_DIR / "celeste.db")
 BACKUP_DIR = DATA_DIR / "backups"
@@ -110,9 +115,27 @@ def restaurar_backup(backup_path):
     except Exception as e:
         st.error(f"Erro ao restaurar backup: {e}")
         return False
+def backup_to_github():
+    try:
+        # Adiciona todos os arquivos
+        subprocess.run(["git", "add", "."], check=True)
+        
+        # Faz commit
+        commit_message = f"Backup automático em {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}"
+        subprocess.run(["git", "commit", "-m", commit_message], check=True)
+        
+        # Faz push
+        subprocess.run(["git", "push"], check=True)
+        return True
+    except Exception as e:
+        st.error(f"Erro ao fazer backup no GitHub: {e}")
+        return False
 
 # Função para criar tabelas do banco de dados
 def criar_tabelas():
+if not Path(DB_NAME).exists():
+    criar_tabelas()
+    st.toast("Banco de dados inicializado", icon="ℹ️")
     # Garante que o diretório existe
     os.makedirs(os.path.dirname(DB_NAME), exist_ok=True)
     
