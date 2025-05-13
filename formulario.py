@@ -69,7 +69,8 @@ def enviar_email(destinatario, codigo):
     except Exception as e:
         st.error(f"Erro ao enviar e-mail: {e}")
         return False
- Funções de backup e restauração
+
+# Funções de backup e restauração
 def fazer_backup_banco_dados():
     try:
         timestamp = datetime.now().strftime('%Y%m%d_%H%M%S')
@@ -94,7 +95,6 @@ def fazer_backup_banco_dados():
     except Exception as e:
         st.error(f"Erro ao fazer backup: {e}")
         return False
-
 def restaurar_backup(backup_path):
     try:
         # Fecha todas as conexões existentes
