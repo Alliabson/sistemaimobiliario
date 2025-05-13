@@ -22,8 +22,6 @@ logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 
-
-
 # Configuração inicial
 st.set_page_config(layout="wide")
 
@@ -93,12 +91,12 @@ def enviar_email(destinatario, codigo):
 
 # Função para criar tabelas do banco de dados
 def criar_tabelas():
-    logger.info("Criando tabelas no banco de dados...")
     # Verificar se o arquivo do banco já existe
     db_existe = os.path.exists(DB_NAME)
     
     conn = sqlite3.connect(DB_NAME)
     cursor = conn.cursor()
+    logger.info("Criando tabelas no banco de dados...")
     
     # Só criar tabelas se o banco não existia antes
     if not db_existe:
