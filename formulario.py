@@ -132,128 +132,128 @@ def backup_to_github():
 
 # Função para criar tabelas do banco de dados
 def criar_tabelas():
-        if not Path(DB_NAME).exists():
-    criar_tabelas()
-    st.toast("Banco de dados inicializado", icon="ℹ️")
-    # Garante que o diretório existe
-    os.makedirs(os.path.dirname(DB_NAME), exist_ok=True)
-    
-    conn = sqlite3.connect(DB_NAME)
-    cursor = conn.cursor()
-    
-    cursor.execute('''
-    CREATE TABLE IF NOT EXISTS usuarios (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        username TEXT NOT NULL UNIQUE,
-        senha_hash TEXT NOT NULL,
-        nome_completo TEXT NOT NULL,
-        cpf TEXT,
-        email TEXT,
-        telefone TEXT,
-        imobiliaria TEXT,
-        is_admin INTEGER DEFAULT 0,
-        data_criacao TEXT,
-        token_recuperacao TEXT,
-        token_validade TEXT
-    )
-    ''')
-    
-    cursor.execute('''
-    CREATE TABLE IF NOT EXISTS clientes_pf (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        nome TEXT NOT NULL,
-        genero TEXT,
-        data_nascimento TEXT,
-        celular TEXT NOT NULL,
-        cpf TEXT NOT NULL,
-        email TEXT,  
-        nacionalidade TEXT,
-        profissao TEXT,
-        estado_civil TEXT,
-        regime_casamento TEXT,
-        uniao_estavel TEXT,
-        cep TEXT,
-        endereco TEXT,
-        numero TEXT,
-        bairro TEXT,
-        cidade TEXT,
-        estado TEXT,
-        nome_conjuge TEXT,
-        genero_conjuge TEXT,
-        data_nascimento_conjuge TEXT,
-        cpf_conjuge TEXT,
-        email_conjuge TEXT,  
-        celular_conjuge TEXT,
-        nacionalidade_conjuge TEXT,
-        profissao_conjuge TEXT,
-        estado_civil_conjuge TEXT,
-        regime_casamento_conjuge TEXT,
-        uniao_estavel_conjuge TEXT,
-        cep_conjuge TEXT,
-        endereco_conjuge TEXT,
-        numero_conjuge TEXT,
-        bairro_conjuge TEXT,
-        cidade_conjuge TEXT,
-        estado_conjuge TEXT,
-        data_cadastro TEXT,
-        corretor TEXT,
-        imobiliaria TEXT,
-        numero_negocio TEXT,
-        usuario_id INTEGER,
-        FOREIGN KEY(usuario_id) REFERENCES usuarios(id)
-    )
-    ''')
-    
-    cursor.execute('''
-    CREATE TABLE IF NOT EXISTS clientes_pj (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        razao_social TEXT NOT NULL,
-        cnpj TEXT NOT NULL,
-        email TEXT,
-        telefone_empresa TEXT,
-        cep_empresa TEXT,
-        endereco_empresa TEXT,
-        numero_empresa TEXT,
-        bairro_empresa TEXT,
-        cidade_empresa TEXT,
-        estado_empresa TEXT,
-        genero_administrador TEXT,
-        nome_administrador TEXT NOT NULL,
-        data_nascimento_administrador TEXT,
-        cpf_administrador TEXT NOT NULL,
-        celular_administrador TEXT NOT NULL,
-        email_administrador TEXT,
-        nacionalidade_administrador TEXT,
-        profissao_administrador TEXT,
-        estado_civil_administrador TEXT,
-        regime_casamento_administrador TEXT,
-        uniao_estavel_administrador TEXT,
-        cep_administrador TEXT,
-        endereco_administrador TEXT,
-        numero_administrador TEXT,
-        bairro_administrador TEXT,
-        cidade_administrador TEXT,
-        estado_administrador TEXT,
-        data_cadastro TEXT,
-        corretor TEXT,
-        imobiliaria TEXT,
-        numero_negocio TEXT,
-        usuario_id INTEGER,
-        FOREIGN KEY(usuario_id) REFERENCES usuarios(id)
-    )
-    ''')
-    
-    cursor.execute('''
-    CREATE TABLE IF NOT EXISTS pessoas_vinculadas_pj (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        empresa_id INTEGER NOT NULL,
-        dados_pessoa TEXT NOT NULL,  -- JSON com todos os dados da pessoa
-        FOREIGN KEY(empresa_id) REFERENCES clientes_pj(id)
-    )
-    ''')
-    
-    conn.commit()
-    conn.close()
+    if not Path(DB_NAME).exists():
+        criar_tabelas()
+        st.toast("Banco de dados inicializado", icon="ℹ️")
+        # Garante que o diretório existe
+        os.makedirs(os.path.dirname(DB_NAME), exist_ok=True)
+        
+        conn = sqlite3.connect(DB_NAME)
+        cursor = conn.cursor()
+        
+        cursor.execute('''
+        CREATE TABLE IF NOT EXISTS usuarios (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            username TEXT NOT NULL UNIQUE,
+            senha_hash TEXT NOT NULL,
+            nome_completo TEXT NOT NULL,
+            cpf TEXT,
+            email TEXT,
+            telefone TEXT,
+            imobiliaria TEXT,
+            is_admin INTEGER DEFAULT 0,
+            data_criacao TEXT,
+            token_recuperacao TEXT,
+            token_validade TEXT
+        )
+        ''')
+        
+        cursor.execute('''
+        CREATE TABLE IF NOT EXISTS clientes_pf (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            nome TEXT NOT NULL,
+            genero TEXT,
+            data_nascimento TEXT,
+            celular TEXT NOT NULL,
+            cpf TEXT NOT NULL,
+            email TEXT,  
+            nacionalidade TEXT,
+            profissao TEXT,
+            estado_civil TEXT,
+            regime_casamento TEXT,
+            uniao_estavel TEXT,
+            cep TEXT,
+            endereco TEXT,
+            numero TEXT,
+            bairro TEXT,
+            cidade TEXT,
+            estado TEXT,
+            nome_conjuge TEXT,
+            genero_conjuge TEXT,
+            data_nascimento_conjuge TEXT,
+            cpf_conjuge TEXT,
+            email_conjuge TEXT,  
+            celular_conjuge TEXT,
+            nacionalidade_conjuge TEXT,
+            profissao_conjuge TEXT,
+            estado_civil_conjuge TEXT,
+            regime_casamento_conjuge TEXT,
+            uniao_estavel_conjuge TEXT,
+            cep_conjuge TEXT,
+            endereco_conjuge TEXT,
+            numero_conjuge TEXT,
+            bairro_conjuge TEXT,
+            cidade_conjuge TEXT,
+            estado_conjuge TEXT,
+            data_cadastro TEXT,
+            corretor TEXT,
+            imobiliaria TEXT,
+            numero_negocio TEXT,
+            usuario_id INTEGER,
+            FOREIGN KEY(usuario_id) REFERENCES usuarios(id)
+        )
+        ''')
+        
+        cursor.execute('''
+        CREATE TABLE IF NOT EXISTS clientes_pj (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            razao_social TEXT NOT NULL,
+            cnpj TEXT NOT NULL,
+            email TEXT,
+            telefone_empresa TEXT,
+            cep_empresa TEXT,
+            endereco_empresa TEXT,
+            numero_empresa TEXT,
+            bairro_empresa TEXT,
+            cidade_empresa TEXT,
+            estado_empresa TEXT,
+            genero_administrador TEXT,
+            nome_administrador TEXT NOT NULL,
+            data_nascimento_administrador TEXT,
+            cpf_administrador TEXT NOT NULL,
+            celular_administrador TEXT NOT NULL,
+            email_administrador TEXT,
+            nacionalidade_administrador TEXT,
+            profissao_administrador TEXT,
+            estado_civil_administrador TEXT,
+            regime_casamento_administrador TEXT,
+            uniao_estavel_administrador TEXT,
+            cep_administrador TEXT,
+            endereco_administrador TEXT,
+            numero_administrador TEXT,
+            bairro_administrador TEXT,
+            cidade_administrador TEXT,
+            estado_administrador TEXT,
+            data_cadastro TEXT,
+            corretor TEXT,
+            imobiliaria TEXT,
+            numero_negocio TEXT,
+            usuario_id INTEGER,
+            FOREIGN KEY(usuario_id) REFERENCES usuarios(id)
+        )
+        ''')
+        
+        cursor.execute('''
+        CREATE TABLE IF NOT EXISTS pessoas_vinculadas_pj (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            empresa_id INTEGER NOT NULL,
+            dados_pessoa TEXT NOT NULL,  -- JSON com todos os dados da pessoa
+            FOREIGN KEY(empresa_id) REFERENCES clientes_pj(id)
+        )
+        ''')
+        
+        conn.commit()
+        conn.close()
 
 # Criar tabelas se não existirem
 criar_tabelas()
