@@ -16,11 +16,6 @@ import random
 import ssl
 from email.message import EmailMessage
 import json
-import os
-import logging
-logging.basicConfig(level=logging.INFO)
-logger = logging.getLogger(__name__)
-
 
 # Configuração inicial
 st.set_page_config(layout="wide")
@@ -44,26 +39,6 @@ SENHA_APP = "jzix jalk dnkx wreq"
 def criar_hash(senha):
     return hashlib.sha256(senha.encode()).hexdigest()
 
-def fazer_backup():
-    try:
-        # Criar pasta de backups se não existir
-        os.makedirs("backups", exist_ok=True)
-        
-        # Nome do arquivo de backup com timestamp
-        backup_name = f"backups/celeste_backup_{datetime.now().strftime('%Y%m%d_%H%M%S')}.db"
-        
-        # Copiar o banco atual para o backup
-        import shutil
-        shutil.copyfile(DB_NAME, backup_name)
-        
-        # Manter também uma cópia como "latest.db"
-        shutil.copyfile(DB_NAME, "backups/latest.db")
-        
-    except Exception as e:
-        st.error(f"Erro ao fazer backup: {e}")
-
-# Chamar a função após operações importantes
-fazer_backup()
 # Funções de e-mail
 def gerar_codigo_autenticacao():
     return str(random.randint(100000, 999999))
@@ -91,31 +66,25 @@ def enviar_email(destinatario, codigo):
 
 # Função para criar tabelas do banco de dados
 def criar_tabelas():
-    # Verificar se o arquivo do banco já existe
-    db_existe = os.path.exists(DB_NAME)
-    
     conn = sqlite3.connect(DB_NAME)
     cursor = conn.cursor()
-    logger.info("Criando tabelas no banco de dados...")
     
-    # Só criar tabelas se o banco não existia antes
-    if not db_existe:
-        cursor.execute('''
-        CREATE TABLE IF NOT EXISTS usuarios (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            username TEXT NOT NULL UNIQUE,
-            senha_hash TEXT NOT NULL,
-            nome_completo TEXT NOT NULL,
-            cpf TEXT,
-            email TEXT,
-            telefone TEXT,
-            imobiliaria TEXT,
-            is_admin INTEGER DEFAULT 0,
-            data_criacao TEXT,
-            token_recuperacao TEXT,
-            token_validade TEXT
-        )
-        ''')
+    cursor.execute('''
+    CREATE TABLE IF NOT EXISTS usuarios (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        username TEXT NOT NULL UNIQUE,
+        senha_hash TEXT NOT NULL,
+        nome_completo TEXT NOT NULL,
+        cpf TEXT,
+        email TEXT,
+        telefone TEXT,
+        imobiliaria TEXT,
+        is_admin INTEGER DEFAULT 0,
+        data_criacao TEXT,
+        token_recuperacao TEXT,
+        token_validade TEXT
+    )
+    ''')
     
     cursor.execute('''
     CREATE TABLE IF NOT EXISTS clientes_pf (
@@ -390,39 +359,17 @@ def alterar_senha(username, nova_senha):
     gerar_backup_credenciais()
 
 def verificar_admin_padrao():
-    try:
-        conn = sqlite3.connect(DB_NAME)
-        cursor = conn.cursor()
-        
-        # Verifica se a tabela usuarios existe
-        cursor.execute("SELECT name FROM sqlite_master WHERE type='table' AND name='usuarios'")
-        tabela_existe = cursor.fetchone()
-        
-        if tabela_existe:
-            cursor.execute('SELECT id FROM usuarios WHERE is_admin = 1')
-            admin = cursor.fetchone()
-            
-            if not admin:
-                cadastrar_usuario('admin', 'admin', 'Administrador Padrão', 
-                                '000.000.000-00', 'admin@example.com', '(00) 00000-0000', 
-                                'Admin Imobiliária', True)
-                st.toast("Usuário admin padrão criado (login: admin, senha: admin)", icon="🔑")
-        else:
-            # Se a tabela não existe, cria todas as tabelas
-            criar_tabelas()
-            # Cria o admin após criar as tabelas
-            cadastrar_usuario('admin', 'admin', 'Administrador Padrão', 
-                            '000.000.000-00', 'admin@example.com', '(00) 00000-0000', 
-                            'Admin Imobiliária', True)
-            st.toast("Tabelas criadas e usuário admin padrão criado (login: admin, senha: admin)", icon="🔑")
-            
-    except Exception as e:
-        st.error(f"Erro ao verificar admin padrão: {str(e)}")
-        # Tenta criar as tabelas novamente em caso de erro
-        criar_tabelas()
-    finally:
-        if 'conn' in locals():
-            conn.close()
+    conn = sqlite3.connect(DB_NAME)
+    cursor = conn.cursor()
+    cursor.execute('SELECT id FROM usuarios WHERE is_admin = 1')
+    admin = cursor.fetchone()
+    
+    if not admin:
+        cadastrar_usuario('admin', 'admin', 'Administrador Padrão', 
+                         '000.000.000-00', 'admin@example.com', '(00) 00000-0000', 
+                         'Admin Imobiliária', True)
+        st.toast("Usuário admin padrão criado (login: admin, senha: admin)", icon="🔑")
+    conn.close()
 
 verificar_admin_padrao()
 
