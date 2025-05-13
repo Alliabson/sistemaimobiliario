@@ -22,9 +22,7 @@ import subprocess
 # Configuração inicial
 st.set_page_config(layout="wide")
 
-if submitted_pf:
-    salvar_cliente_pf(...)
-    backup_to_github()
+
 
 # Configuração de diretório persistente
 DATA_DIR = Path(".") / "persistent_data"  # Mudança aqui
