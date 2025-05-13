@@ -30,7 +30,7 @@ except Exception as e:
     st.warning(f"Não foi possível carregar a logo: {e}")
 
 # Configuração do banco de dados
-DB_NAME = os.path.join(os.path.dirname(__file__), "celeste.db")
+DB_NAME = "celeste.db"
 
 # Configurações de e-mail
 EMAIL_REMETENTE = "alli@imobiliariaceleste.com.br"
@@ -385,17 +385,39 @@ def alterar_senha(username, nova_senha):
     gerar_backup_credenciais()
 
 def verificar_admin_padrao():
-    conn = sqlite3.connect(DB_NAME)
-    cursor = conn.cursor()
-    cursor.execute('SELECT id FROM usuarios WHERE is_admin = 1')
-    admin = cursor.fetchone()
-    
-    if not admin:
-        cadastrar_usuario('admin', 'admin', 'Administrador Padrão', 
-                         '000.000.000-00', 'admin@example.com', '(00) 00000-0000', 
-                         'Admin Imobiliária', True)
-        st.toast("Usuário admin padrão criado (login: admin, senha: admin)", icon="🔑")
-    conn.close()
+    try:
+        conn = sqlite3.connect(DB_NAME)
+        cursor = conn.cursor()
+        
+        # Verifica se a tabela usuarios existe
+        cursor.execute("SELECT name FROM sqlite_master WHERE type='table' AND name='usuarios'")
+        tabela_existe = cursor.fetchone()
+        
+        if tabela_existe:
+            cursor.execute('SELECT id FROM usuarios WHERE is_admin = 1')
+            admin = cursor.fetchone()
+            
+            if not admin:
+                cadastrar_usuario('admin', 'admin', 'Administrador Padrão', 
+                                '000.000.000-00', 'admin@example.com', '(00) 00000-0000', 
+                                'Admin Imobiliária', True)
+                st.toast("Usuário admin padrão criado (login: admin, senha: admin)", icon="🔑")
+        else:
+            # Se a tabela não existe, cria todas as tabelas
+            criar_tabelas()
+            # Cria o admin após criar as tabelas
+            cadastrar_usuario('admin', 'admin', 'Administrador Padrão', 
+                            '000.000.000-00', 'admin@example.com', '(00) 00000-0000', 
+                            'Admin Imobiliária', True)
+            st.toast("Tabelas criadas e usuário admin padrão criado (login: admin, senha: admin)", icon="🔑")
+            
+    except Exception as e:
+        st.error(f"Erro ao verificar admin padrão: {str(e)}")
+        # Tenta criar as tabelas novamente em caso de erro
+        criar_tabelas()
+    finally:
+        if 'conn' in locals():
+            conn.close()
 
 verificar_admin_padrao()
 
