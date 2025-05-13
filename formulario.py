@@ -22,6 +22,7 @@ import subprocess
 
 if submitted_pf:
     salvar_cliente_pf(...)
+    salvar_cliente_pj(...)
     backup_to_github()
 
 # Configuração inicial
