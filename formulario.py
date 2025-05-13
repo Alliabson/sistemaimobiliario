@@ -319,7 +319,15 @@ def verificar_login(username, senha):
                 'email': usuario[5]
             }
     return None
-
+    
+if 'logado' in st.session_state and st.session_state['logado']:
+    # Fazer backup a cada 24 horas
+    if 'ultimo_backup' not in st.session_state or \
+       (datetime.now() - st.session_state['ultimo_backup']).days >= 1:
+        if fazer_backup_banco_dados():
+            st.session_state['ultimo_backup'] = datetime.now()
+            st.toast("Backup automático realizado com sucesso!", icon="💾")
+            
 def cadastrar_usuario(username, senha, nome_completo, cpf, email, telefone, imobiliaria, is_admin=False):
     conn = sqlite3.connect(DB_NAME)
     cursor = conn.cursor()
@@ -1237,11 +1245,12 @@ else:
         st.rerun()
 
     # Abas principais
-    tab1, tab2, tab3, tab4 = st.tabs([
+    tab1, tab2, tab3, tab4, tab5 = st.tabs([
         "Ficha Cadastral PF", 
         "Ficha Cadastral PJ", 
         "Consulta de Registros",
-        "Simulador Financeiro"  # Adicionei o quarto item
+        "Simulador Financeiro",
+        "Backup/Restauração"
     ])
     # Variáveis para controle dos downloads
     pdf_path_pf = None
@@ -2265,3 +2274,35 @@ else:
                 st.error(f"Erro ao carregar o simulador: {e}")
                 time.sleep(1)
                 st.rerun()
+        with tab5:
+            st.header("Backup e Restauração de Dados")
+            
+            if st.session_state['usuario']['is_admin']:
+                st.subheader("Fazer Backup Agora")
+                if st.button("Realizar Backup Completo"):
+                    if fazer_backup_banco_dados():
+                        st.success("Backup realizado com sucesso!")
+                    else:
+                        st.error("Falha ao realizar backup")
+                
+                st.subheader("Restaurar Backup")
+                
+                # Listar backups disponíveis
+                backups = []
+                if os.path.exists(BACKUP_DIR):
+                    backups = sorted([f for f in os.listdir(BACKUP_DIR) if f.startswith('db_backup_')], reverse=True)
+                
+                if backups:
+                    backup_selecionado = st.selectbox("Selecione um backup para restaurar", backups)
+                    
+                    if st.button("Restaurar Backup Selecionado"):
+                        st.warning("Esta ação irá substituir todos os dados atuais. Continuar?")
+                        if st.button("Confirmar Restauração"):
+                            if restaurar_backup(str(BACKUP_DIR / backup_selecionado)):
+                                st.success("Backup restaurado com sucesso! A página será recarregada.")
+                                time.sleep(2)
+                                st.rerun()
+                else:
+                    st.info("Nenhum backup encontrado")
+            else:
+                st.warning("Apenas administradores podem acessar esta funcionalidade")
