@@ -133,9 +133,9 @@ def backup_to_github():
 
 # Função para criar tabelas do banco de dados
 def criar_tabelas():
-if not Path(DB_NAME).exists():
-    criar_tabelas()
-    st.toast("Banco de dados inicializado", icon="ℹ️")
+    if not Path(DB_NAME).exists():
+        criar_tabelas()
+        st.toast("Banco de dados inicializado", icon="ℹ️")
     # Garante que o diretório existe
     os.makedirs(os.path.dirname(DB_NAME), exist_ok=True)
     
