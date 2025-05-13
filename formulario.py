@@ -19,10 +19,9 @@ from email.message import EmailMessage
 import json
 import shutil
 import subprocess
+
 # Configuração inicial
 st.set_page_config(layout="wide")
-
-
 
 # Configuração de diretório persistente
 DATA_DIR = Path(".") / "persistent_data"  # Mudança aqui
@@ -1663,7 +1662,10 @@ else:
                     file_name=f"ficha_pf_{nome if nome else 'sem_nome'}.pdf",
                     mime="application/pdf"
                 )
-
+    if submitted_pf:
+        salvar_cliente_pf(...)
+        backup_to_github()
+    
     with tab2:
         st.header("Ficha Cadastral - Pessoa Jurídica")
         
