@@ -17,6 +17,12 @@ import ssl
 from email.message import EmailMessage
 import json
 import os
+import logging
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
+
+
+
 
 # Configuração inicial
 st.set_page_config(layout="wide")
@@ -87,6 +93,7 @@ def enviar_email(destinatario, codigo):
 
 # Função para criar tabelas do banco de dados
 def criar_tabelas():
+    logger.info("Criando tabelas no banco de dados...")
     # Verificar se o arquivo do banco já existe
     db_existe = os.path.exists(DB_NAME)
     
