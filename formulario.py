@@ -28,7 +28,7 @@ if submitted_pf:
 st.set_page_config(layout="wide")
 
 # Configuração de diretório persistente
-DATA_DIR = Path(".") / "persistent_data"
+DATA_DIR = Path(".") / "persistent_data"  # Mudança aqui
 DATA_DIR.mkdir(exist_ok=True)
 DB_NAME = str(DATA_DIR / "celeste.db")
 BACKUP_DIR = DATA_DIR / "backups"
