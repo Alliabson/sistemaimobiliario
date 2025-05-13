@@ -1,0 +1,18 @@
+# Backups
+backups/
+
+# Ambiente virtual
+venv/
+.env
+
+# Arquivos temporários
+*.tmp
+*.temp
+
+# Arquivos do sistema
+.DS_Store
+Thumbs.db
+
+# Python
+__pycache__/
+*.py[cod]
