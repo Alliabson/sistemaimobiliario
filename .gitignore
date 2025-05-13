@@ -2,6 +2,10 @@
 venv/
 .env
 
+# Arquivos temporários
+*.tmp
+*.temp
+
 # Arquivos do sistema
 .DS_Store
 Thumbs.db
