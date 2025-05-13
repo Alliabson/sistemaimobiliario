@@ -8,6 +8,7 @@ import io
 from typing import Optional, Dict
 import tempfile
 import os
+from pathlib import Path
 from fpdf import FPDF
 import time
 import hashlib
@@ -16,9 +17,17 @@ import random
 import ssl
 from email.message import EmailMessage
 import json
+import shutil
 
 # Configuração inicial
 st.set_page_config(layout="wide")
+
+# Configuração de diretório persistente
+DATA_DIR = Path(__file__).parent / "persistent_data"
+DATA_DIR.mkdir(exist_ok=True)
+DB_NAME = str(DATA_DIR / "celeste.db")
+BACKUP_DIR = DATA_DIR / "backups"
+BACKUP_DIR.mkdir(exist_ok=True)
 
 # Pré-carregar a logo (opcional)
 LOGO_PATH = 'Logo_pdf.png'
@@ -27,9 +36,6 @@ try:
     LOGO_CACHE = open(LOGO_PATH, 'rb').read()
 except Exception as e:
     st.warning(f"Não foi possível carregar a logo: {e}")
-
-# Configuração do banco de dados
-DB_NAME = "celeste.db"
 
 # Configurações de e-mail
 EMAIL_REMETENTE = "alli@imobiliariaceleste.com.br"
@@ -63,9 +69,53 @@ def enviar_email(destinatario, codigo):
     except Exception as e:
         st.error(f"Erro ao enviar e-mail: {e}")
         return False
+ Funções de backup e restauração
+def fazer_backup_banco_dados():
+    try:
+        timestamp = datetime.now().strftime('%Y%m%d_%H%M%S')
+        backup_path = str(BACKUP_DIR / f"db_backup_{timestamp}.db")
+        
+        # Copia o banco de dados atual para o arquivo de backup
+        shutil.copy2(DB_NAME, backup_path)
+        
+        # Faz backup em formato CSV também
+        conn = sqlite3.connect(DB_NAME)
+        tabelas = ['usuarios', 'clientes_pf', 'clientes_pj', 'pessoas_vinculadas_pj']
+        
+        for tabela in tabelas:
+            try:
+                df = pd.read_sql(f'SELECT * FROM {tabela}', conn)
+                df.to_csv(str(BACKUP_DIR / f"{tabela}_backup_{timestamp}.csv"), index=False)
+            except Exception as e:
+                st.error(f"Erro ao fazer backup da tabela {tabela}: {e}")
+        
+        conn.close()
+        return True
+    except Exception as e:
+        st.error(f"Erro ao fazer backup: {e}")
+        return False
+
+def restaurar_backup(backup_path):
+    try:
+        # Fecha todas as conexões existentes
+        if 'conn' in locals():
+            conn.close()
+        
+        # Copia o backup para o local do banco de dados principal
+        shutil.copy2(backup_path, DB_NAME)
+        
+        st.success("Backup restaurado com sucesso!")
+        st.rerun()
+        return True
+    except Exception as e:
+        st.error(f"Erro ao restaurar backup: {e}")
+        return False
 
 # Função para criar tabelas do banco de dados
 def criar_tabelas():
+    # Garante que o diretório existe
+    os.makedirs(os.path.dirname(DB_NAME), exist_ok=True)
+    
     conn = sqlite3.connect(DB_NAME)
     cursor = conn.cursor()
     
