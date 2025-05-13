@@ -31,6 +31,10 @@ except Exception as e:
 # Configuração do banco de dados
 DB_NAME = "celeste.db"
 
+# Conectar ao banco de dados
+conexao = sqlite3.connect(db_path)
+cursor = conexao.cursor()
+
 # Configurações de e-mail
 EMAIL_REMETENTE = "alli@imobiliariaceleste.com.br"
 SENHA_APP = "jzix jalk dnkx wreq"
