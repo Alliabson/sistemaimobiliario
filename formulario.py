@@ -26,7 +26,7 @@ import git
 st.set_page_config(layout="wide")
 
 # Adicione isso junto com as outras configurações iniciais
-GITHUB_REPO = "https://github.com/Alliabson/sistemaimobiliario"  # Substitua pelo seu repositório
+GITHUB_REPO = "https://github.com/Alliabson/sistemaimobiliario/tree/main/backups"  # Substitua pelo seu repositório
 GITHUB_TOKEN = st.secrets.get("Iv23liEu3rsT2UMxPPLN", "")  # Armazene o token nos segredos do Streamlit
 BACKUP_FILE_NAME = "celeste_backup.db"
 
@@ -79,7 +79,7 @@ def enviar_email(destinatario, codigo):
         return False
 
 # Funções de backup e restauração
-ddef fazer_backup_banco_dados():
+def fazer_backup_banco_dados():
     try:
         # Backup local
         timestamp = datetime.now().strftime('%Y%m%d_%H%M%S')
