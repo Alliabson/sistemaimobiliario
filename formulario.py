@@ -18,17 +18,9 @@ import ssl
 from email.message import EmailMessage
 import json
 import shutil
-import base64
-from github import Github, InputGitTreeElement
-import git
 
 # Configuração inicial
 st.set_page_config(layout="wide")
-
-# Adicione isso junto com as outras configurações iniciais
-GITHUB_REPO = "https://github.com/Alliabson/sistemaimobiliario/tree/main/backups"  # Substitua pelo seu repositório
-GITHUB_TOKEN = st.secrets.get("Iv23liEu3rsT2UMxPPLN", "")  # Armazene o token nos segredos do Streamlit
-BACKUP_FILE_NAME = "celeste_backup.db"
 
 # Configuração de diretório persistente
 DATA_DIR = Path(__file__).parent / "persistent_data"
@@ -81,12 +73,13 @@ def enviar_email(destinatario, codigo):
 # Funções de backup e restauração
 def fazer_backup_banco_dados():
     try:
-        # Backup local
         timestamp = datetime.now().strftime('%Y%m%d_%H%M%S')
         backup_path = str(BACKUP_DIR / f"db_backup_{timestamp}.db")
+        
+        # Copia o banco de dados atual para o arquivo de backup
         shutil.copy2(DB_NAME, backup_path)
         
-        # Backup em CSV
+        # Faz backup em formato CSV também
         conn = sqlite3.connect(DB_NAME)
         tabelas = ['usuarios', 'clientes_pf', 'clientes_pj', 'pessoas_vinculadas_pj']
         
@@ -98,11 +91,6 @@ def fazer_backup_banco_dados():
                 st.error(f"Erro ao fazer backup da tabela {tabela}: {e}")
         
         conn.close()
-        
-        # Backup no GitHub
-        if GITHUB_TOKEN:
-            fazer_backup_github()
-        
         return True
     except Exception as e:
         st.error(f"Erro ao fazer backup: {e}")
@@ -248,14 +236,6 @@ def criar_tabelas():
 # Criar tabelas se não existirem
 criar_tabelas()
 
-# Tentar restaurar backup do GitHub ao iniciar
-if 'backup_restaurado' not in st.session_state and GITHUB_TOKEN:
-    if restaurar_backup_github():
-        st.session_state['backup_restaurado'] = True
-        st.toast("Backup do GitHub restaurado com sucesso!", icon="✅")
-    else:
-        st.toast("Usando banco de dados local", icon="ℹ️")
-        
 # Funções para pessoas vinculadas PJ
 def adicionar_pessoa_vinculada(empresa_id, dados_pessoa):
     conn = sqlite3.connect(DB_NAME)
@@ -367,69 +347,6 @@ def cadastrar_usuario(username, senha, nome_completo, cpf, email, telefone, imob
         return False
     finally:
         conn.close()
-def fazer_backup_github():
-    """Faz backup do banco de dados para o GitHub"""
-    try:
-        # Conectar ao GitHub
-        g = Github(GITHUB_TOKEN)
-        repo = g.get_repo(GITHUB_REPO)
-        
-        # Ler o conteúdo do banco de dados
-        with open(DB_NAME, 'rb') as f:
-            content = f.read()
-        
-        # Codificar em base64
-        content_b64 = base64.b64encode(content).decode('utf-8')
-        
-        # Verificar se o arquivo já existe
-        try:
-            file = repo.get_contents(BACKUP_FILE_NAME)
-            # Atualizar arquivo existente
-            repo.update_file(BACKUP_FILE_NAME, 
-                           f"Backup automático {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}", 
-                           content_b64, 
-                           file.sha)
-        except:
-            # Criar novo arquivo
-            repo.create_file(BACKUP_FILE_NAME, 
-                           f"Backup automático {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}", 
-                           content_b64)
-        
-        return True
-    except Exception as e:
-        st.error(f"Erro ao fazer backup no GitHub: {e}")
-        return False
-
-def restaurar_backup_github():
-    """Restaura o backup do GitHub"""
-    try:
-        # Conectar ao GitHub
-        g = Github(GITHUB_TOKEN)
-        repo = g.get_repo(GITHUB_REPO)
-        
-        # Obter o arquivo de backup
-        file = repo.get_contents(BACKUP_FILE_NAME)
-        content = base64.b64decode(file.content)
-        
-        # Salvar localmente
-        with open(DB_NAME, 'wb') as f:
-            f.write(content)
-        
-        # Recarregar dados
-        if 'clientes_pf' in st.session_state:
-            st.session_state.clientes_pf = carregar_clientes_pf(
-                st.session_state['usuario']['id'] if not st.session_state['usuario']['is_admin'] else None
-            )
-        
-        if 'clientes_pj' in st.session_state:
-            st.session_state.clientes_pj = carregar_clientes_pj(
-                st.session_state['usuario']['id'] if not st.session_state['usuario']['is_admin'] else None
-            )
-        
-        return True
-    except Exception as e:
-        st.warning(f"Não foi possível restaurar backup do GitHub: {e}")
-        return False
 
 def gerar_backup_credenciais():
     conn = sqlite3.connect(DB_NAME)
@@ -2403,55 +2320,35 @@ else:
                 st.error(f"Erro ao carregar o simulador: {e}")
                 time.sleep(1)
                 st.rerun()
-        #  Aqui       
         with tab5:
             st.header("Backup e Restauração de Dados")
             
             if st.session_state['usuario']['is_admin']:
                 st.subheader("Fazer Backup Agora")
-                col1, col2 = st.columns(2)
-                
-                with col1:
-                    if st.button("Backup Local"):
-                        if fazer_backup_banco_dados():
-                            st.success("Backup local realizado com sucesso!")
-                        else:
-                            st.error("Falha ao realizar backup local")
-                
-                with col2:
-                    if GITHUB_TOKEN and st.button("Backup no GitHub"):
-                        if fazer_backup_github():
-                            st.success("Backup no GitHub realizado com sucesso!")
-                        else:
-                            st.error("Falha ao realizar backup no GitHub")
+                if st.button("Realizar Backup Completo"):
+                    if fazer_backup_banco_dados():
+                        st.success("Backup realizado com sucesso!")
+                    else:
+                        st.error("Falha ao realizar backup")
                 
                 st.subheader("Restaurar Backup")
                 
-                # Restaurar do GitHub
-                if GITHUB_TOKEN and st.button("Restaurar do GitHub"):
-                    st.warning("Esta ação irá substituir todos os dados atuais. Continuar?")
-                    if st.button("Confirmar Restauração do GitHub"):
-                        if restaurar_backup_github():
-                            st.success("Backup do GitHub restaurado com sucesso! A página será recarregada.")
-                            time.sleep(2)
-                            st.rerun()
-                
-                # Restaurar backup local (mantenha o código existente)
+                # Listar backups disponíveis
                 backups = []
                 if os.path.exists(BACKUP_DIR):
                     backups = sorted([f for f in os.listdir(BACKUP_DIR) if f.startswith('db_backup_')], reverse=True)
                 
                 if backups:
-                    backup_selecionado = st.selectbox("Selecione um backup local para restaurar", backups)
+                    backup_selecionado = st.selectbox("Selecione um backup para restaurar", backups)
                     
-                    if st.button("Restaurar Backup Local Selecionado"):
+                    if st.button("Restaurar Backup Selecionado"):
                         st.warning("Esta ação irá substituir todos os dados atuais. Continuar?")
-                        if st.button("Confirmar Restauração Local"):
+                        if st.button("Confirmar Restauração"):
                             if restaurar_backup(str(BACKUP_DIR / backup_selecionado)):
-                                st.success("Backup local restaurado com sucesso! A página será recarregada.")
+                                st.success("Backup restaurado com sucesso! A página será recarregada.")
                                 time.sleep(2)
                                 st.rerun()
                 else:
-                    st.info("Nenhum backup local encontrado")
+                    st.info("Nenhum backup encontrado")
             else:
                 st.warning("Apenas administradores podem acessar esta funcionalidade")
