@@ -553,7 +553,7 @@ def gerar_pdf_formatado(tipo, dados):
     pdf.set_font('Arial', 'B', 14)
     pdf.cell(0, 10, 'FICHA CADASTRAL', 0, 1, 'C')
     pdf.ln(5)
-    
+    # colar aqui
     if tipo == 'pf':
         pdf.set_font('Arial', 'B', 12)
         pdf.cell(0, 8, 'PESSOA FÍSICA', 0, 1)
@@ -808,62 +808,81 @@ def gerar_pdf_formatado(tipo, dados):
             pdf.cell(0, 7, 'PESSOAS VINCULADAS', 0, 1)
             
             for idx, pessoa in enumerate(dados['pessoas_vinculadas']):
+                # Garantir que todos os campos existam
+                pessoa = {
+                    'tipo': pessoa.get('tipo', ''),
+                    'nome': pessoa.get('nome', ''),
+                    'genero': pessoa.get('genero', ''),
+                    'cpf': pessoa.get('cpf', ''),
+                    'data_nascimento': pessoa.get('data_nascimento', ''),
+                    'estado_civil': pessoa.get('estado_civil', ''),
+                    'regime_casamento': pessoa.get('regime_casamento', ''),
+                    'uniao_estavel': pessoa.get('uniao_estavel', 'NÃO'),
+                    'cargo': pessoa.get('cargo', ''),
+                    'celular': pessoa.get('celular', ''),
+                    'email': pessoa.get('email', ''),
+                    'cep': pessoa.get('cep', ''),
+                    'endereco': pessoa.get('endereco', ''),
+                    'numero': pessoa.get('numero', ''),
+                    'bairro': pessoa.get('bairro', ''),
+                    'cidade': pessoa.get('cidade', ''),
+                    'estado': pessoa.get('estado', '')
+                }
+                
                 # Título com número da pessoa
                 pdf.set_font('Arial', 'B', 10)
-                pdf.cell(0, 6, f'PESSOA VINCULADA {idx + 1} - {pessoa.get("tipo", "").upper()}', 0, 1)
+                pdf.cell(0, 6, f'PESSOA VINCULADA {idx + 1} - {pessoa["tipo"].upper()}', 0, 1)
                 pdf.set_font('Arial', '', 10)
                 
-                # Dados Pessoais (mesma estrutura do administrador)
+                # Dados Pessoais
                 pdf.cell(60, 6, 'NOME COMPLETO SEM ABREVIAR:', 0, 0)
-                pdf.cell(0, 6, pessoa.get('nome', ''), 0, 1)
+                pdf.cell(0, 6, pessoa['nome'], 0, 1)
                 
                 pdf.cell(25, 6, 'GÊNERO:', 0, 0)
-                pdf.cell(25, 6, pessoa.get('genero', ''), 0, 0)
+                pdf.cell(25, 6, pessoa['genero'], 0, 0)
                 pdf.cell(40, 6, 'DATA NASCIMENTO:', 0, 0)
-                pdf.cell(0, 6, pessoa.get('data_nascimento', ''), 0, 1)
+                pdf.cell(0, 6, pessoa['data_nascimento'], 0, 1)
                 
                 pdf.cell(20, 6, 'CPF:', 0, 0)
-                pdf.cell(40, 6, formatar_cpf(pessoa.get('cpf', '')), 0, 0)
+                pdf.cell(40, 6, formatar_cpf(pessoa['cpf']), 0, 0)
                 pdf.cell(25, 6, 'CELULAR:', 0, 0)
-                pdf.cell(0, 6, formatar_telefone(pessoa.get('celular', '')), 0, 1)
+                pdf.cell(0, 6, formatar_telefone(pessoa['celular']), 0, 1)
                 
                 pdf.cell(20, 6, 'E-MAIL:', 0, 0)
-                pdf.cell(0, 6, pessoa.get('email', ''), 0, 1)
+                pdf.cell(0, 6, pessoa['email'], 0, 1)
                 
                 pdf.cell(35, 6, 'CARGO/FUNÇÃO:', 0, 0)
-                pdf.cell(40, 6, pessoa.get('cargo', ''), 0, 0)
+                pdf.cell(40, 6, pessoa['cargo'], 0, 0)
                 
-                # Estado Civil com espaços (alterado)
-                pdf.cell(30, 6, 'ESTADO CIVIL:   ', 0, 0)  # 3 espaços adicionais
-                pdf.cell(0, 6, pessoa.get('estado_civil', ''), 0, 1)
+                pdf.cell(30, 6, 'ESTADO CIVIL:   ', 0, 0)
+                pdf.cell(0, 6, pessoa['estado_civil'], 0, 1)
                 
                 pdf.cell(30, 6, 'UNIÃO ESTÁVEL:', 0, 0)
-                pdf.cell(0, 6, pessoa.get('uniao_estavel', 'NÃO'), 0, 1)
+                pdf.cell(0, 6, pessoa['uniao_estavel'], 0, 1)
                 
-                # Regime Casamento com espaços (alterado)
-                pdf.cell(45, 6, 'REGIME CASAMENTO:   ', 0, 0)  # 3 espaços adicionais
-                pdf.cell(0, 6, pessoa.get('regime_casamento', ''), 0, 1)
+                pdf.cell(45, 6, 'REGIME CASAMENTO:   ', 0, 0)
+                pdf.cell(0, 6, pessoa['regime_casamento'], 0, 1)
                 pdf.ln(2)
                 
-                # Endereço (mesma estrutura do administrador)
+                # Endereço
                 pdf.set_font('Arial', 'B', 11)
                 pdf.cell(0, 7, 'ENDEREÇO', 0, 1)
                 pdf.set_font('Arial', '', 10)
                 
                 pdf.cell(15, 6, 'CEP:', 0, 0)
-                pdf.cell(20, 6, pessoa.get('cep', ''), 0, 0)
+                pdf.cell(20, 6, pessoa['cep'], 0, 0)
                 pdf.cell(25, 6, 'ENDEREÇO:', 0, 0)
-                pdf.cell(0, 6, pessoa.get('endereco', ''), 0, 1)
+                pdf.cell(0, 6, pessoa['endereco'], 0, 1)
                 
                 pdf.cell(20, 6, 'NÚMERO:', 0, 0)
-                pdf.cell(20, 6, pessoa.get('numero', ''), 0, 0)
+                pdf.cell(20, 6, pessoa['numero'], 0, 0)
                 pdf.cell(20, 6, 'BAIRRO:', 0, 0)
-                pdf.cell(0, 6, pessoa.get('bairro', ''), 0, 1)
+                pdf.cell(0, 6, pessoa['bairro'], 0, 1)
                 
                 pdf.cell(20, 6, 'CIDADE:', 0, 0)
-                pdf.cell(40, 6, pessoa.get('cidade', ''), 0, 0)
+                pdf.cell(40, 6, pessoa['cidade'], 0, 0)
                 pdf.cell(25, 6, 'ESTADO:', 0, 0)
-                pdf.cell(0, 6, pessoa.get('estado', ''), 0, 1)
+                pdf.cell(0, 6, pessoa['estado'], 0, 1)
                 
                 # Espaço entre pessoas vinculadas
                 pdf.ln(4)
@@ -915,9 +934,40 @@ def salvar_cliente_pf(cliente, usuario_id):
     cursor = conn.cursor()
     
     if 'id' in cliente:
-        # Código de update permanece o mesmo
-        pass
+        # Atualização de registro existente
+        cursor.execute('''
+        UPDATE clientes_pf SET
+            nome = ?, genero = ?, data_nascimento = ?, celular = ?, cpf = ?, email = ?,
+            nacionalidade = ?, profissao = ?, estado_civil = ?, regime_casamento = ?, uniao_estavel = ?,
+            cep = ?, endereco = ?, numero = ?, bairro = ?, cidade = ?, estado = ?,
+            nome_conjuge = ?, genero_conjuge = ?, data_nascimento_conjuge = ?, cpf_conjuge = ?,
+            celular_conjuge = ?, email_conjuge = ?, nacionalidade_conjuge = ?, profissao_conjuge = ?,
+            estado_civil_conjuge = ?, regime_casamento_conjuge = ?, uniao_estavel_conjuge = ?,
+            cep_conjuge = ?, endereco_conjuge = ?, numero_conjuge = ?, bairro_conjuge = ?,
+            cidade_conjuge = ?, estado_conjuge = ?, data_cadastro = ?,
+            corretor = ?, imobiliaria = ?, numero_negocio = ?, usuario_id = ?
+        WHERE id = ?
+        ''', (
+            cliente['nome'], cliente['genero'], cliente['data_nascimento'],
+            cliente['celular'], cliente['cpf'], cliente.get('email', ''),
+            cliente['nacionalidade'], cliente['profissao'], cliente['estado_civil'],
+            cliente['regime_casamento'], cliente['uniao_estavel'],
+            cliente['cep'], cliente['endereco'], cliente['numero'],
+            cliente['bairro'], cliente['cidade'], cliente['estado'],
+            cliente.get('nome_conjuge', ''), cliente.get('genero_conjuge', ''), 
+            cliente.get('data_nascimento_conjuge', ''), cliente.get('cpf_conjuge', ''),
+            cliente.get('celular_conjuge', ''), cliente.get('email_conjuge', ''), 
+            cliente.get('nacionalidade_conjuge', ''), cliente.get('profissao_conjuge', ''),
+            cliente.get('estado_civil_conjuge', ''), cliente.get('regime_casamento_conjuge', ''),
+            cliente.get('uniao_estavel_conjuge', ''), cliente.get('cep_conjuge', ''),
+            cliente.get('endereco_conjuge', ''), cliente.get('numero_conjuge', ''),
+            cliente.get('bairro_conjuge', ''), cliente.get('cidade_conjuge', ''),
+            cliente.get('estado_conjuge', ''), cliente['data_cadastro'], 
+            cliente['corretor'], cliente['imobiliaria'], cliente['numero_negocio'],
+            usuario_id, cliente['id']
+        ))
     else:
+        # Inserção de novo registro
         cursor.execute('''
         INSERT INTO clientes_pf (
             nome, genero, data_nascimento, celular, cpf, email,
@@ -1500,27 +1550,12 @@ else:
             cep_formatado = re.sub(r'[^0-9]', '', st.session_state.get("cep_pf", ""))
             data_nascimento_formatada = data_nascimento.strftime('%d/%m/%Y') if data_nascimento else ""
             
-            if tem_conjuge == "SIM":
-                cpf_conjuge_formatado = formatar_cpf(st.session_state.get("cpf_conjuge_pf", ""))
-                celular_conjuge_formatado = formatar_telefone(st.session_state.get("celular_conjuge_pf", ""))
-                cep_conjuge_formatado = re.sub(r'[^0-9]', '', st.session_state.get("cep_conjuge_pf", ""))
-                data_nascimento_conjuge_formatada = data_nascimento_conjuge.strftime('%d/%m/%Y') if data_nascimento_conjuge else ""
-            else:
-                cpf_conjuge_formatado = celular_conjuge_formatado = cep_conjuge_formatado = data_nascimento_conjuge_formatada = ""
-                genero_conjuge = ""
-                nome_conjuge = ""
-                email_conjuge = ""
-                nacionalidade_conjuge = ""
-                profissao_conjuge = ""
-                estado_civil_conjuge = ""
-                regime_casamento_conjuge = ""
-                uniao_estavel_conjuge = False
-                endereco_conjuge = ""
-                numero_conjuge = ""
-                bairro_conjuge = ""
-                cidade_conjuge = ""
-                estado_conjuge = ""
-            
+            # Sempre processar campos do cônjuge/2° proponente (a decisão de usar ou não é feita depois)
+            cpf_conjuge_formatado = formatar_cpf(st.session_state.get("cpf_conjuge_pf", ""))
+            celular_conjuge_formatado = formatar_telefone(st.session_state.get("celular_conjuge_pf", ""))
+            cep_conjuge_formatado = re.sub(r'[^0-9]', '', st.session_state.get("cep_conjuge_pf", ""))
+            data_nascimento_conjuge_formatada = data_nascimento_conjuge.strftime('%d/%m/%Y') if data_nascimento_conjuge else ""
+
             if not nome or not cpf_formatado or not celular_formatado:
                 st.error("Por favor, preencha os campos obrigatórios (*)")
             elif not validar_cpf(cpf_formatado):
@@ -1544,23 +1579,24 @@ else:
                     'bairro': st.session_state.get("bairro_pf", ""),
                     'cidade': st.session_state.get("cidade_pf", ""),
                     'estado': st.session_state.get("estado_pf", ""),
-                    'nome_conjuge': nome_conjuge if tem_conjuge == "SIM" else "",
-                    'genero_conjuge': genero_conjuge if tem_conjuge == "SIM" else "",
-                    'data_nascimento_conjuge': data_nascimento_conjuge_formatada if tem_conjuge == "SIM" else "",
-                    'cpf_conjuge': cpf_conjuge_formatado if tem_conjuge == "SIM" else "",
-                    'celular_conjuge': celular_conjuge_formatado if tem_conjuge == "SIM" else "",
-                    'email_conjuge': email_conjuge if tem_conjuge == "SIM" else "",
-                    'nacionalidade_conjuge': nacionalidade_conjuge if tem_conjuge == "SIM" else "",
-                    'profissao_conjuge': profissao_conjuge if tem_conjuge == "SIM" else "",
-                    'estado_civil_conjuge': estado_civil_conjuge if tem_conjuge == "SIM" else "",
-                    'uniao_estavel_conjuge': "SIM" if tem_conjuge == "SIM" and uniao_estavel_conjuge else "NÃO",
-                    'regime_casamento_conjuge': regime_casamento_conjuge if tem_conjuge == "SIM" else "",
-                    'cep_conjuge': cep_conjuge_formatado if tem_conjuge == "SIM" else "",
-                    'endereco_conjuge': st.session_state.get("endereco_conjuge_pf", "") if tem_conjuge == "SIM" else "",
-                    'numero_conjuge': st.session_state.get("numero_conjuge_pf", "") if tem_conjuge == "SIM" else "",
-                    'bairro_conjuge': st.session_state.get("bairro_conjuge_pf", "") if tem_conjuge == "SIM" else "",
-                    'cidade_conjuge': st.session_state.get("cidade_conjuge_pf", "") if tem_conjuge == "SIM" else "",
-                    'estado_conjuge': st.session_state.get("estado_conjuge_pf", "") if tem_conjuge == "SIM" else "",
+                    # Campos do cônjuge/2° proponente - sempre incluídos, mas podem ser vazios
+                    'nome_conjuge': nome_conjuge,
+                    'genero_conjuge': genero_conjuge,
+                    'data_nascimento_conjuge': data_nascimento_conjuge_formatada,
+                    'cpf_conjuge': cpf_conjuge_formatado,
+                    'celular_conjuge': celular_conjuge_formatado,
+                    'email_conjuge': email_conjuge,
+                    'nacionalidade_conjuge': nacionalidade_conjuge,
+                    'profissao_conjuge': profissao_conjuge,
+                    'estado_civil_conjuge': estado_civil_conjuge,
+                    'uniao_estavel_conjuge': "SIM" if uniao_estavel_conjuge else "NÃO",
+                    'regime_casamento_conjuge': regime_casamento_conjuge,
+                    'cep_conjuge': cep_conjuge_formatado,
+                    'endereco_conjuge': st.session_state.get("endereco_conjuge_pf", ""),
+                    'numero_conjuge': st.session_state.get("numero_conjuge_pf", ""),
+                    'bairro_conjuge': st.session_state.get("bairro_conjuge_pf", ""),
+                    'cidade_conjuge': st.session_state.get("cidade_conjuge_pf", ""),
+                    'estado_conjuge': st.session_state.get("estado_conjuge_pf", ""),
                     'data_cadastro': datetime.now().strftime('%d/%m/%Y %H:%M:%S'),
                     'corretor': corretor,
                     'imobiliaria': imobiliaria,
@@ -2033,11 +2069,19 @@ else:
                         del st.session_state['editar_pj_id']
                         st.rerun()
                     
-                    # Gera o PDF após salvar
-                    pdf_path_pj = gerar_pdf_formatado('pj', novo_cliente)
+                    # Gera o PDF após salvar incluindo pessoas vinculadas
+                    dados_pdf = novo_cliente.copy()
+                    if 'pessoas_temp' in st.session_state:
+                        dados_pdf['pessoas_vinculadas'] = st.session_state.pessoas_temp
+                    elif 'editar_pj_id' not in st.session_state:  # Novo registro sem pessoas
+                        dados_pdf['pessoas_vinculadas'] = []
+                    else:  # Edição de registro existente
+                        dados_pdf['pessoas_vinculadas'] = obter_pessoas_vinculadas(empresa_id)
+                    
+                    pdf_path_pj = gerar_pdf_formatado('pj', dados_pdf)
                 except Exception as e:
                     st.error(f"Erro ao salvar cliente: {e}")
-        
+
         if imprimir_pj:
             # Formata os dados para impressão
             dados_impressao = {
@@ -2078,6 +2122,8 @@ else:
                 dados_impressao['pessoas_vinculadas'] = st.session_state.pessoas_temp
             elif 'editar_pj_id' in st.session_state:
                 dados_impressao['pessoas_vinculadas'] = obter_pessoas_vinculadas(st.session_state['editar_pj_id'])
+            else:
+                dados_impressao['pessoas_vinculadas'] = []
             
             # Gera o PDF
             pdf_path_pj = gerar_pdf_formatado('pj', dados_impressao)
