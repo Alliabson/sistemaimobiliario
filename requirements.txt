@@ -5,3 +5,4 @@ streamlit
  openpyxl
  XlsxWriter
 numpy-financial
+PyGithub
