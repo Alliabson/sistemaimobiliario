@@ -1431,6 +1431,8 @@ else:
                 data_nascimento = st.date_input("Data de Nascimento", 
                                               value=datetime.strptime(cliente_editando['data_nascimento'], '%d/%m/%Y') if 'editar_pf_id' in st.session_state and cliente_editando['data_nascimento'] else None,
                                               format="DD/MM/YYYY",
+                                              min_value=datetime(1900, 1, 1),
+                                              max_value=datetime.now(),
                                               key="data_nascimento_pf")
             
             # Linha 3: CPF e Celular
@@ -1529,6 +1531,8 @@ else:
                 data_nascimento_conjuge = st.date_input("Data de Nascimento", 
                                                     value=datetime.strptime(cliente_editando['data_nascimento_conjuge'], '%d/%m/%Y') if 'editar_pf_id' in st.session_state and cliente_editando.get('data_nascimento_conjuge', '') else None,
                                                     format="DD/MM/YYYY",
+                                                    min_value=datetime(1900, 1, 1),
+                                                    max_value=datetime.now(),
                                                     key="data_nascimento_conjuge_pf")
 
             # Linha 2: CPF e Celular
@@ -1862,6 +1866,8 @@ else:
                 data_nascimento_administrador = st.date_input("Data de Nascimento", 
                                                             value=datetime.strptime(cliente_editando['data_nascimento_administrador'], '%d/%m/%Y') if 'editar_pj_id' in st.session_state and cliente_editando['data_nascimento_administrador'] else None,
                                                             format="DD/MM/YYYY",
+                                                            min_value=datetime(1900, 1, 1),
+                                                            max_value=datetime.now(),
                                                             key="data_nascimento_administrador_pj")
                 
                 st.markdown("**Dados Complementares**")
