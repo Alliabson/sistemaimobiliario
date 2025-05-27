@@ -123,6 +123,47 @@ def restaurar_backup(backup_path):
         st.error(f"Erro ao restaurar backup: {e}")
         return False
 
+def backup_para_google_sheets():
+    try:
+        # Backup de PF
+        conn = sqlite3.connect(DB_NAME)
+        df_pf = pd.read_sql('SELECT * FROM clientes_pf', conn)
+        client = autenticar_google_sheets()
+        planilha = client.open_by_key('1TSq7QQCFAiC84a1djA7tUeLVwvD7Bvrl4P2rLtYz36E')
+        aba_pf = planilha.worksheet('Pessoa física')
+        
+        # Limpar a aba (exceto cabeçalho)
+        aba_pf.clear()
+        # Adicionar cabeçalhos
+        aba_pf.append_row(['blank', 'id', 'nome', 'genero', 'data_nascimento', 'celular', 'cpf', 'email', 'nacionalidade', 'estado_civil', 'regime_casamento', 'uniao_estavel', 'cep', 'endereco', 'numero', 'bairro', 'cidade', 'estado', 'nome_conjge', 'data_nascimento_conjuge', 'cpf_conjuge', 'email_conjuge', 'celular_coonjuge', 'nacionalidade_conjuge', 'estado_civil_conjuge', 'regime_casamento_conjuge', 'uniao_estavel', 'cep_conjuge', 'endereco_conjuge', 'numero_conjuge', 'bairro_conjuge', 'estado_conjge', 'data_cadastro', 'corretor', 'imobiliaria', 'numero_negocio', 'usuario_id'])  # Complete com seus cabeçalhos
+        
+        # Adicionar dados
+        for _, row in df_pf.iterrows():
+            valores = row.tolist()
+            valores.insert(0, '')  # Adiciona a coluna blank
+            aba_pf.append_row(valores)
+        
+        # Backup de PJ
+        df_pj = pd.read_sql('SELECT * FROM clientes_pj', conn)
+        aba_pj = planilha.worksheet('Pessoa jurídica')
+        
+        # Limpar a aba (exceto cabeçalho)
+        aba_pj.clear()
+        # Adicionar cabeçalhos
+        aba_pj.append_row(['blank', 'id', 'razao_social', 'cnpj', 'email', 'telefone_empresa', 'cep_empresa', 'endereco_empresa', 'numero_empresa', 'bairro_empresa', 'cidade_empresa', 'estado_empresa', 'genero_administrador', 'nome_administrador', 'data_nascimento_administrador', 'cpf_administrador', 'celular_administrador', 'email_administrador', 'profissao_administrador', 'estado_civil_administrador', 'regime_casamento_administrador', 'uniao_estavel_administrador', 'cep_administrador', 'endereco_administrador', 'numero_administrador', 'bairro_administrador', 'cidade_administrador', 'estado_administrador', 'data_cadastro', 'corretor', 'imobiliaria', 'numero_negocio', 'usuario_id'])  # Complete com seus cabeçalhos
+        
+        # Adicionar dados
+        for _, row in df_pj.iterrows():
+            valores = row.tolist()
+            valores.insert(0, '')  # Adiciona a coluna blank
+            aba_pj.append_row(valores)
+        
+        conn.close()
+        return True
+    except Exception as e:
+        st.error(f"Erro no backup para Google Sheets: {e}")
+        return False
+        
 # Função para criar tabelas do banco de dados
 def criar_tabelas():
     # Garante que o diretório existe
