@@ -21,6 +21,8 @@ import shutil
 import base64
 from github import Github, InputGitTreeElement
 import git
+import gspread
+from oauth2client.service_account import ServiceAccountCredentials
 
 # Configuração inicial
 st.set_page_config(layout="wide")
@@ -37,6 +39,7 @@ DB_NAME = str(DATA_DIR / "celeste.db")
 BACKUP_DIR = DATA_DIR / "backups"
 BACKUP_DIR.mkdir(exist_ok=True)
 
+
 # Pré-carregar a logo (opcional)
 LOGO_PATH = 'Logo_pdf.png'
 LOGO_CACHE = None
@@ -48,6 +51,28 @@ except Exception as e:
 # Configurações de e-mail
 EMAIL_REMETENTE = "alli@imobiliariaceleste.com.br"
 SENHA_APP = "jzix jalk dnkx wreq"
+
+def autenticar_google_sheets():
+    scope = ['https://spreadsheets.google.com/feeds',
+             'https://www.googleapis.com/auth/drive']
+    
+    # Você pode armazenar as credenciais nos segredos do Streamlit
+    creds_dict = {
+        "type": st.secrets["google_creds"]["type"],
+        "project_id": st.secrets["google_creds"]["project_id"],
+        "private_key_id": st.secrets["google_creds"]["private_key_id"],
+        "private_key": st.secrets["google_creds"]["private_key"],
+        "client_email": st.secrets["google_creds"]["client_email"],
+        "client_id": st.secrets["google_creds"]["client_id"],
+        "auth_uri": st.secrets["google_creds"]["auth_uri"],
+        "token_uri": st.secrets["google_creds"]["token_uri"],
+        "auth_provider_x509_cert_url": st.secrets["google_creds"]["auth_provider_x509_cert_url"],
+        "client_x509_cert_url": st.secrets["google_creds"]["client_x509_cert_url"]
+    }
+    
+    creds = ServiceAccountCredentials.from_json_keyfile_dict(creds_dict, scope)
+    client = gspread.authorize(creds)
+    return client
 
 # Função para criar hash de senha
 def criar_hash(senha):
@@ -128,19 +153,49 @@ def backup_para_google_sheets():
         # Backup de PF
         conn = sqlite3.connect(DB_NAME)
         df_pf = pd.read_sql('SELECT * FROM clientes_pf', conn)
+        
+        # Autenticar
         client = autenticar_google_sheets()
+        
+        # Abrir a planilha
         planilha = client.open_by_key('1TSq7QQCFAiC84a1djA7tUeLVwvD7Bvrl4P2rLtYz36E')
+        
+        # Processar Pessoa Física
         aba_pf = planilha.worksheet('Pessoa física')
         
         # Limpar a aba (exceto cabeçalho)
         aba_pf.clear()
-        # Adicionar cabeçalhos
-        aba_pf.append_row(['blank', 'id', 'nome', 'genero', 'data_nascimento', 'celular', 'cpf', 'email', 'nacionalidade', 'estado_civil', 'regime_casamento', 'uniao_estavel', 'cep', 'endereco', 'numero', 'bairro', 'cidade', 'estado', 'nome_conjge', 'data_nascimento_conjuge', 'cpf_conjuge', 'email_conjuge', 'celular_coonjuge', 'nacionalidade_conjuge', 'estado_civil_conjuge', 'regime_casamento_conjuge', 'uniao_estavel', 'cep_conjuge', 'endereco_conjuge', 'numero_conjuge', 'bairro_conjuge', 'estado_conjge', 'data_cadastro', 'corretor', 'imobiliaria', 'numero_negocio', 'usuario_id'])  # Complete com seus cabeçalhos
         
-        # Adicionar dados
+        # Definir cabeçalhos corretamente
+        cabecalhos_pf = ['blank', 'id', 'nome', 'genero', 'data_nascimento', 'celular', 'cpf', 'email', 
+                        'nacionalidade', 'profissao', 'estado_civil', 'regime_casamento', 'uniao_estavel', 
+                        'cep', 'endereco', 'numero', 'bairro', 'cidade', 'estado', 'nome_conjuge', 
+                        'data_nascimento_conjuge', 'cpf_conjuge', 'email_conjuge', 'celular_conjuge', 
+                        'nacionalidade_conjuge', 'profissao_conjuge', 'estado_civil_conjuge', 
+                        'regime_casamento_conjuge', 'uniao_estavel_conjuge', 'cep_conjuge', 
+                        'endereco_conjuge', 'numero_conjuge', 'bairro_conjuge', 'cidade_conjuge', 
+                        'estado_conjuge', 'data_cadastro', 'corretor', 'imobiliaria', 'numero_negocio', 
+                        'usuario_id']
+        
+        aba_pf.append_row(cabecalhos_pf)
+        
+        # Adicionar dados formatados
         for _, row in df_pf.iterrows():
-            valores = row.tolist()
-            valores.insert(0, '')  # Adiciona a coluna blank
+            valores = ['']  # Coluna blank
+            
+            # Adicionar cada campo na ordem correta
+            for campo in cabecalhos_pf[1:]:  # Pular o 'blank'
+                valor = row.get(campo, '')
+                
+                # Formatar datas
+                if 'data' in campo and pd.notna(valor):
+                    try:
+                        valor = datetime.strptime(valor, '%d/%m/%Y').strftime('%d/%m/%Y')
+                    except:
+                        pass
+                
+                valores.append(str(valor) if pd.notna(valor) else '')
+            
             aba_pf.append_row(valores)
         
         # Backup de PJ
@@ -149,13 +204,37 @@ def backup_para_google_sheets():
         
         # Limpar a aba (exceto cabeçalho)
         aba_pj.clear()
-        # Adicionar cabeçalhos
-        aba_pj.append_row(['blank', 'id', 'razao_social', 'cnpj', 'email', 'telefone_empresa', 'cep_empresa', 'endereco_empresa', 'numero_empresa', 'bairro_empresa', 'cidade_empresa', 'estado_empresa', 'genero_administrador', 'nome_administrador', 'data_nascimento_administrador', 'cpf_administrador', 'celular_administrador', 'email_administrador', 'profissao_administrador', 'estado_civil_administrador', 'regime_casamento_administrador', 'uniao_estavel_administrador', 'cep_administrador', 'endereco_administrador', 'numero_administrador', 'bairro_administrador', 'cidade_administrador', 'estado_administrador', 'data_cadastro', 'corretor', 'imobiliaria', 'numero_negocio', 'usuario_id'])  # Complete com seus cabeçalhos
         
-        # Adicionar dados
+        # Definir cabeçalhos corretamente
+        cabecalhos_pj = ['blank', 'id', 'razao_social', 'cnpj', 'email', 'telefone_empresa', 
+                        'cep_empresa', 'endereco_empresa', 'numero_empresa', 'bairro_empresa', 
+                        'cidade_empresa', 'estado_empresa', 'genero_administrador', 
+                        'nome_administrador', 'data_nascimento_administrador', 'cpf_administrador', 
+                        'celular_administrador', 'email_administrador', 'nacionalidade_administrador', 
+                        'profissao_administrador', 'estado_civil_administrador', 
+                        'regime_casamento_administrador', 'uniao_estavel_administrador', 
+                        'cep_administrador', 'endereco_administrador', 'numero_administrador', 
+                        'bairro_administrador', 'cidade_administrador', 'estado_administrador', 
+                        'data_cadastro', 'corretor', 'imobiliaria', 'numero_negocio', 'usuario_id']
+        
+        aba_pj.append_row(cabecalhos_pj)
+        
+        # Adicionar dados formatados
         for _, row in df_pj.iterrows():
-            valores = row.tolist()
-            valores.insert(0, '')  # Adiciona a coluna blank
+            valores = ['']  # Coluna blank
+            
+            for campo in cabecalhos_pj[1:]:  # Pular o 'blank'
+                valor = row.get(campo, '')
+                
+                # Formatar datas
+                if 'data' in campo and pd.notna(valor):
+                    try:
+                        valor = datetime.strptime(valor, '%d/%m/%Y').strftime('%d/%m/%Y')
+                    except:
+                        pass
+                
+                valores.append(str(valor) if pd.notna(valor) else '')
+            
             aba_pj.append_row(valores)
         
         conn.close()
@@ -1125,6 +1204,7 @@ def salvar_cliente_pf(cliente, usuario_id):
         ))
     
     conn.commit()
+    backup_para_google_sheets()
     conn.close()
 
 def salvar_cliente_pj(cliente, usuario_id):
@@ -1205,6 +1285,7 @@ def salvar_cliente_pj(cliente, usuario_id):
         empresa_id = cursor.lastrowid
     
     conn.commit()
+    backup_para_google_sheets()
     conn.close()
     return empresa_id
 
