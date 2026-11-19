@@ -1,0 +1,13 @@
+.git
+.github
+.gitignore
+venv
+.env
+persistent_data
+backups
+__pycache__
+*.py[cod]
+*.tmp
+*.temp
+.DS_Store
+Thumbs.db
