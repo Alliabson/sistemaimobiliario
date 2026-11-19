@@ -1,5 +1,6 @@
 # Backups
 backups/
+persistent_data/
 
 # Ambiente virtual
 venv/
